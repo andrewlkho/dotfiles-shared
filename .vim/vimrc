@@ -1,0 +1,168 @@
+" ---- Load plugins ------------------------------------------------------------
+
+call plug#begin('~/.vim/bundle')
+Plug 'arcticicestudio/nord-vim'
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-eunuch'
+Plug 'tpope/vim-surround'
+call plug#end()
+
+
+" ---- General options ---------------------------------------------------------
+
+" colours
+syntax enable
+colorscheme nord
+
+" UI
+set autoindent
+set backspace=indent,eol,start
+set cursorline
+set fillchars=vert:\ 
+set laststatus=2
+set lazyredraw
+set listchars=tab:>-,trail:-,eol:¬
+set number
+set relativenumber
+set noshowmode
+set scrolloff=5
+set shortmess+=I
+set showtabline=0
+set splitbelow
+set splitright
+
+" indentation is 4 spaces, don't use tabs (but if present display as 4 spaces)
+set expandtab
+set softtabstop=4
+set shiftwidth=4
+set tabstop=4
+
+" searching
+set incsearch
+set ignorecase
+set smartcase
+
+" utf-8
+set encoding=utf-8
+set fileencoding=utf-8
+
+" buffers
+set hidden
+
+
+" ---- Statusline --------------------------------------------------------------
+
+let g:mode_map={
+            \ 'n' : 'NORMAL',
+            \ 'i' : 'INSERT',
+            \ 'R' : 'REPLACE',
+            \ 'v' : 'VISUAL',
+            \ 'V' : 'V-LINE',
+            \ "\<C-v>" : 'V-BLOCK',
+            \ 'c' : 'COMMAND',
+            \ 's' : 'SELECT',
+            \ 'S': 'S-LINE',
+            \ "\<C-s>" : 'S-BLOCK',
+            \ 'r' : 'PROMPT',
+            \ '!' : 'SHELL',
+            \ 't' : 'TERMINAL'
+            \ }
+
+let g:mode_colour={
+            \ 'n' : 'normal',
+            \ 'i' : 'insert',
+            \ 'R' : 'replace',
+            \ 'v' : 'visual',
+            \ 'V' : 'visual',
+            \ "\<C-v>" : 'visual',
+            \ 'c' : 'other',
+            \ 's' : 'other',
+            \ 'S': 'other',
+            \ "\<C-s>" : 'other',
+            \ 'r' : 'other',
+            \ '!' : 'other',
+            \ 't' : 'other'
+            \ }
+
+highlight StatusLineNormal ctermfg=0 guifg=#3B4252 ctermbg=6 guibg=#88C0D0
+highlight StatusLineInsert ctermfg=0 guifg=#3B4252 ctermbg=15 guibg=#ECEFF4
+highlight StatusLineReplace ctermfg=0 guifg=#3B4252 ctermbg=3 guibg=#EBCB8B
+highlight StatusLineVisual ctermfg=0 guifg=#3B4252 ctermbg=14 guibg=#8FBCBB
+highlight StatusLineOther ctermfg=7 guifg=#E5E9F0 ctermbg=NONE guibg=#2E3440
+highlight link StatusLinePaste StatuslineInsert
+highlight StatusLineGroup0 ctermfg=7 guifg=#E5E9F0 ctermbg=8 guibg=#4C566A
+highlight StatusLineGroup1 ctermfg=7 guifg=#E5E9F0 ctermbg=0 guibg=#3B4252
+highlight StatusLineGroup1Red ctermfg=1 guifg=#bf616a ctermbg=0 guibg=#3B4252
+highlight StatusLineGroup1Yellow ctermfg=3 guifg=#EBCB8B ctermbg=0 guibg=#3B4252
+highlight link StatusLineNC StatusLineGroup0
+
+function! SetStatusLineActive()
+    setlocal statusline=
+    setlocal statusline+=%#StatusLineNormal#%{(g:mode_colour[mode()]=='normal')?'\ \ '.g:mode_map[mode()].'\ ':''}
+    setlocal statusline+=%#StatusLineInsert#%{(g:mode_colour[mode()]=='insert')?'\ \ '.g:mode_map[mode()].'\ ':''}
+    setlocal statusline+=%#StatusLineReplace#%{(g:mode_colour[mode()]=='replace')?'\ \ '.g:mode_map[mode()].'\ ':''}
+    setlocal statusline+=%#StatusLineVisual#%{(g:mode_colour[mode()]=='visual')?'\ \ '.g:mode_map[mode()].'\ ':''}
+    setlocal statusline+=%#StatusLineOther#%{(g:mode_colour[mode()]=='other')?'\ \ '.g:mode_map[mode()].'\ ':''}
+    setlocal statusline+=%#StatusLinePaste#%{(&paste)?'\ \ PASTE\ ':''}
+    setlocal statusline+=%#StatusLineGroup1#\ %t
+    setlocal statusline+=%#StatusLineGroup1Yellow#%{&readonly?'\ !!':''}
+    setlocal statusline+=%#StatusLineGroup1Red#%{&modified?'∙':''}%#StatusLineGroup1#\ 
+    setlocal statusline+=%#StatusLineGroup0#
+    setlocal statusline+=%=
+    setlocal statusline+=%{&fileformat}\ \|
+    setlocal statusline+=\ %{&fileencoding?&fileencoding:&encoding}\ \|
+    setlocal statusline+=\ %{&filetype!=''?&filetype:'-'}\ 
+    setlocal statusline+=%#StatusLineGroup1#%4v:%-4l≡%4L\ 
+endfunction
+
+function! SetStatusLineInactive()
+    setlocal statusline=
+    setlocal statusline+=%#StatusLineNC#
+    setlocal statusline=\ %t
+    setlocal statusline+=%{&readonly?'\ !!':''}
+    setlocal statusline+=%#StatusLineGroup1Red#%{&modified?'∙':''}%#StatusLineNC#\ 
+endfunction
+
+augroup status
+    autocmd!
+    autocmd VimEnter,BufEnter,WinEnter * call SetStatusLineActive()
+    autocmd BufLeave,WinLeave * call SetStatusLineInactive()
+augroup END
+
+
+" ---- Custom mappings ---------------------------------------------------------
+
+nnoremap [B :bfirst<CR>
+nnoremap [b :bprevious<CR>
+nnoremap ]b :bnext<CR>
+nnoremap ]B :blast<CR>
+
+nnoremap [T :tabfirst<CR>
+nnoremap [t :tabprevious<CR>
+nnoremap ]t :tabnext<CR>
+nnoremap ]T :tablast<CR
+
+nnoremap [L :lfirst<CR>
+nnoremap [l :lprevious<CR>
+nnoremap ]l :lnext<CR>
+nnoremap ]L :llast<CR>
+
+nnoremap [Q :cfirst<CR>
+nnoremap [q :cprevious<CR>
+nnoremap ]q :cnext<CR>
+nnoremap ]Q :clast<CR>
+
+nnoremap <leader>p :setlocal paste! paste?<CR>
+nnoremap <leader>i :setlocal list! list?<CR>
+nnoremap <leader>q :setlocal hlsearch! hlsearch?<CR>
+inoremap <C-Z> <C-\><C-O>:stop<CR>
+nnoremap <expr> - ":edit " . expand("%:p:h") . "/<C-D>"
+cnoremap <expr> -
+            \ getcmdpos() > len(getcmdline()) && getcmdline() =~ 'edit /.\+/$' ?
+            \ "\<C-W>\<C-W>\<C-D>" : "-"
+
+" customised buffer list
+nnoremap <C-T> :call local#misc#ls()<CR>:buffer<space>
+
+" requires vim-commentary
+vmap <leader>\ gc
